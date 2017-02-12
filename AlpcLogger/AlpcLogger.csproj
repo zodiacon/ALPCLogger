@@ -91,7 +91,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Models\AlpcCapture.cs" />
-    <Compile Include="Models\AlpcChain.cs" />
     <Compile Include="Models\AlpcChainsFinder.cs" />
     <Compile Include="Models\AlpcMessage.cs" />
     <Compile Include="ViewModels\AlpcMessageViewModel.cs" />
@@ -141,16 +140,9 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="_TraceEventProgrammersGuide.docx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="TraceEvent.ReleaseNotes.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="TraceEvent.ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\disk_blue.ico" />

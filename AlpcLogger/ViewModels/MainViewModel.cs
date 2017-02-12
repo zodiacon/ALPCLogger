@@ -87,15 +87,17 @@ namespace AlpcLogger.ViewModels {
 							var msg = (AlpcMessageViewModel)obj;
 							var src = msg.SourceProcessName.ToLowerInvariant();
 							var tgt = msg.TargetProcessName.ToLowerInvariant();
+							int negates = words.Count(w => w[0] == '-');
+
 							foreach(var text in words) {
 								string negText;
-								if(text[0] == '-' && (src.Contains(negText = text.Substring(1).ToLowerInvariant()) || tgt.Contains(negText)))
+								if(text[0] == '-' && text.Length > 2 && (src.Contains(negText = text.Substring(1).ToLowerInvariant()) || tgt.Contains(negText)))
 									return false;
 
-								if(src.Contains(text) || tgt.Contains(text))
+								if(text[0] != '-' && (src.Contains(text) || tgt.Contains(text)))
 									return true;
 							}
-							return false;
+							return negates == words.Length;
 						};
 					}
 				}

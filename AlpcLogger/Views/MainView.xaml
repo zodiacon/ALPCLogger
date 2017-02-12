@@ -60,8 +60,8 @@
 			</Button>
 		</ToolBar>
 		<StackPanel Orientation="Horizontal" Grid.Row="2">
-			<TextBox Width="400" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=400}" 
-					 metro:TextBoxHelper.Watermark="Type to search" metro:TextBoxHelper.ClearTextButton="True" />
+			<TextBox Width="500" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=400}" 
+					 metro:TextBoxHelper.Watermark="Filter (strings separated by ; prepend dash to filter out)" metro:TextBoxHelper.ClearTextButton="True" />
 		</StackPanel>
 		<DataGrid Grid.Row="3" IsReadOnly="True" AutoGenerateColumns="False" SelectionMode="Single" ItemsSource="{Binding Messages}">
             <DataGrid.Resources>
