@@ -1,0 +1,94 @@
+﻿<UserControl x:Class="AlpcLogger.Views.MainView"
+			 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+			 xmlns:metro="http://metro.mahapps.com/winfx/xaml/controls"
+			 xmlns:local="clr-namespace:AlpcLogger.Views"
+			 xmlns:z="http://zodiacon.wpf/2016"
+			 mc:Ignorable="d" 
+			 d:DesignHeight="200" d:DesignWidth="500">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Menu z:InputHelper.AttachInputBindings="True">
+			<MenuItem Header="_File">
+				<MenuItem Header="_Open..." Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
+				<Separator />
+				<MenuItem Header="Save All..." Command="{Binding SaveAllCommand}" Icon="{z:Image /icons/disk_blue.ico, Width=20, Height=20}" InputGestureText="Ctrl+S" />
+				<MenuItem Header="Save Filtered..." Command="{Binding SaveFilteredCommand}" Icon="{z:Image /icons/disk_green.ico, Width=20, Height=20}" />
+				<Separator />
+				<MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+			</MenuItem>
+			<MenuItem Header="_Trace">
+				<MenuItem Header="_Start" Command="{Binding StartCommand}" Icon="{z:Image /icons/run.ico, Width=20, Height=20}" />
+				<MenuItem Header="Sto_p" Command="{Binding StopCommand}" Icon="{z:Image /icons/stop.ico, Width=20, Height=20}" />
+				<Separator />
+                <MenuItem Header="Clear Log" Command="{Binding ClearLogCommand}" Icon="{z:Image /icons/delete2.ico, Width=20, Height=20}" />
+				<Separator />
+				<MenuItem Header="_Filter..." Command="{Binding FilterCommand}" Icon="{z:Image /icons/filter.ico, Width=20, Height=20}" />
+			</MenuItem>
+            <MenuItem Header="_Analysis">
+                <MenuItem Header="Find Chains..." Command="{Binding FindChainsCommand}" />
+            </MenuItem>
+		</Menu>
+		<ToolBar Grid.Row="1">
+			<Button Command="{Binding StartCommand}">
+				<StackPanel Orientation="Horizontal">
+					<Image Source="/icons/run.ico" Width="24" Height="24" />
+					<TextBlock Text="Run" VerticalAlignment="Center" Margin="4,0,0,0" />
+				</StackPanel>
+			</Button>
+			<Separator />
+			<Button Command="{Binding StopCommand}">
+				<StackPanel Orientation="Horizontal">
+					<Image Source="/icons/stop.ico" Width="24" Height="24" />
+					<TextBlock Text="Stop" VerticalAlignment="Center" Margin="4,0,0,0" />
+				</StackPanel>
+			</Button>
+			<Separator />
+			<Button Command="{Binding FilterCommand}">
+				<StackPanel Orientation="Horizontal">
+					<Image Source="/icons/filter.ico" Width="24" Height="24" />
+					<TextBlock Text="Filter..." VerticalAlignment="Center" Margin="4,0,0,0" />
+				</StackPanel>
+			</Button>
+		</ToolBar>
+		<StackPanel Orientation="Horizontal" Grid.Row="2">
+			<TextBox Width="400" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=400}" 
+					 metro:TextBoxHelper.Watermark="Type to search" metro:TextBoxHelper.ClearTextButton="True" />
+		</StackPanel>
+		<DataGrid Grid.Row="3" IsReadOnly="True" AutoGenerateColumns="False" SelectionMode="Single" ItemsSource="{Binding Messages}">
+            <DataGrid.Resources>
+                <Style TargetType="TextBlock" x:Key="RightAlignTextBlockStyle">
+                    <Setter Property="HorizontalAlignment" Value="Right" />
+                </Style>
+            </DataGrid.Resources>
+			<DataGrid.Columns>
+				<DataGridTextColumn Header="Index" Binding="{Binding Index}" />
+				<DataGridTextColumn Header="Send Time" Binding="{Binding SendTime, StringFormat=HH:mm:ss.fff}" />
+				<DataGridTextColumn Header="Send Process" Binding="{Binding SourceProcessName}" FontWeight="Bold" />
+				<DataGridTextColumn Header="Send PID" Binding="{Binding SourceProcess}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+				<DataGridTextColumn Header="Send TID" Binding="{Binding SourceThread}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+				<DataGridTextColumn Header="Message ID" Binding="{Binding MessageId}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+				<DataGridTextColumn Header="Receive Time" Binding="{Binding ReceiveTime, StringFormat=HH:mm:ss.fff}" />
+                <DataGridTextColumn Header="Receive Process" Binding="{Binding TargetProcessName}" FontWeight="Bold" />
+				<DataGridTextColumn Header="Receive PID" Binding="{Binding TargetProcess}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+				<DataGridTextColumn Header="Receive TID" Binding="{Binding TargetThread}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+			</DataGrid.Columns>
+		</DataGrid>
+
+		<StatusBar Grid.Row="4">
+			<TextBlock Text="{Binding SessionState}" />
+			<Separator />
+			<TextBlock Text="{Binding Messages.Count, StringFormat=Messages: \{0\}}" MinWidth="100" />
+			<Separator />
+			<TextBlock Text="{Binding View.Count, StringFormat=Filtered: \{0\}}" MinWidth="100" />
+		</StatusBar>
+	</Grid>
+</UserControl>
