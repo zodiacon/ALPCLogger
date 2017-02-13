@@ -8,87 +8,131 @@
 			 xmlns:z="http://zodiacon.wpf/2016"
 			 mc:Ignorable="d" 
 			 d:DesignHeight="200" d:DesignWidth="500">
-	<Grid>
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition />
-			<RowDefinition Height="Auto" />
-		</Grid.RowDefinitions>
-		<Menu z:InputHelper.AttachInputBindings="True">
-			<MenuItem Header="_File">
-				<MenuItem Header="_Open..." Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
-				<Separator />
-				<MenuItem Header="Save All..." Command="{Binding SaveAllCommand}" Icon="{z:Image /icons/disk_blue.ico, Width=20, Height=20}" InputGestureText="Ctrl+S" />
-				<MenuItem Header="Save Filtered..." Command="{Binding SaveFilteredCommand}" Icon="{z:Image /icons/disk_green.ico, Width=20, Height=20}" />
-				<Separator />
-				<MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
-			</MenuItem>
-			<MenuItem Header="_Trace">
-				<MenuItem Header="_Start" Command="{Binding StartCommand}" Icon="{z:Image /icons/run.ico, Width=20, Height=20}" />
-				<MenuItem Header="Sto_p" Command="{Binding StopCommand}" Icon="{z:Image /icons/stop.ico, Width=20, Height=20}" />
-				<Separator />
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="TextBlock" x:Key="RightAlignTextBlockStyle">
+                <Setter Property="HorizontalAlignment" Value="Right" />
+            </Style>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Menu z:InputHelper.AttachInputBindings="True">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open..." Command="{Binding OpenCommand}" InputGestureText="Ctrl+O"/>
+                <Separator />
+                <MenuItem Header="Save All..." Command="{Binding SaveAllCommand}" Icon="{z:Image /icons/disk_blue.ico, Width=20, Height=20}" InputGestureText="Ctrl+S" />
+                <MenuItem Header="Save Filtered..." Command="{Binding SaveFilteredCommand}" Icon="{z:Image /icons/disk_green.ico, Width=20, Height=20}" />
+                <Separator />
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Trace">
+                <MenuItem Header="_Start" Command="{Binding StartCommand}" Icon="{z:Image /icons/run.ico, Width=20, Height=20}" />
+                <MenuItem Header="Sto_p" Command="{Binding StopCommand}" Icon="{z:Image /icons/stop.ico, Width=20, Height=20}" />
+                <Separator />
                 <MenuItem Header="Clear Log" Command="{Binding ClearLogCommand}" Icon="{z:Image /icons/delete2.ico, Width=20, Height=20}" />
-				<Separator />
-				<MenuItem Header="_Filter..." Command="{Binding FilterCommand}" Icon="{z:Image /icons/filter.ico, Width=20, Height=20}" />
-			</MenuItem>
+                <Separator />
+                <MenuItem Header="_Filter..." Command="{Binding FilterCommand}" Icon="{z:Image /icons/filter.ico, Width=20, Height=20}" />
+            </MenuItem>
             <MenuItem Header="_Analysis">
                 <MenuItem Header="Find Chains..." Command="{Binding FindChainsCommand}" />
             </MenuItem>
-		</Menu>
-		<ToolBar Grid.Row="1">
-			<Button Command="{Binding StartCommand}">
-				<StackPanel Orientation="Horizontal">
-					<Image Source="/icons/run.ico" Width="24" Height="24" />
-					<TextBlock Text="Run" VerticalAlignment="Center" Margin="4,0,0,0" />
-				</StackPanel>
-			</Button>
-			<Separator />
-			<Button Command="{Binding StopCommand}">
-				<StackPanel Orientation="Horizontal">
-					<Image Source="/icons/stop.ico" Width="24" Height="24" />
-					<TextBlock Text="Stop" VerticalAlignment="Center" Margin="4,0,0,0" />
-				</StackPanel>
-			</Button>
-			<Separator />
-			<Button Command="{Binding FilterCommand}">
-				<StackPanel Orientation="Horizontal">
-					<Image Source="/icons/filter.ico" Width="24" Height="24" />
-					<TextBlock Text="Filter..." VerticalAlignment="Center" Margin="4,0,0,0" />
-				</StackPanel>
-			</Button>
-		</ToolBar>
-		<StackPanel Orientation="Horizontal" Grid.Row="2">
-			<TextBox Width="500" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=400}" 
+        </Menu>
+        <ToolBar Grid.Row="1">
+            <Button Command="{Binding StartCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/icons/run.ico" Width="24" Height="24" />
+                    <TextBlock Text="Run" VerticalAlignment="Center" Margin="4,0,0,0" />
+                </StackPanel>
+            </Button>
+            <Separator />
+            <Button Command="{Binding StopCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/icons/stop.ico" Width="24" Height="24" />
+                    <TextBlock Text="Stop" VerticalAlignment="Center" Margin="4,0,0,0" />
+                </StackPanel>
+            </Button>
+            <Separator />
+            <Button Command="{Binding FilterCommand}">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/icons/filter.ico" Width="24" Height="24" />
+                    <TextBlock Text="Filter..." VerticalAlignment="Center" Margin="4,0,0,0" />
+                </StackPanel>
+            </Button>
+        </ToolBar>
+        <StackPanel Orientation="Horizontal" Grid.Row="2">
+            <TextBox Width="500" Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=400}" 
 					 metro:TextBoxHelper.Watermark="Filter (strings separated by ; prepend dash to filter out)" metro:TextBoxHelper.ClearTextButton="True" />
-		</StackPanel>
-		<DataGrid Grid.Row="3" IsReadOnly="True" AutoGenerateColumns="False" SelectionMode="Single" ItemsSource="{Binding Messages}">
-            <DataGrid.Resources>
-                <Style TargetType="TextBlock" x:Key="RightAlignTextBlockStyle">
-                    <Setter Property="HorizontalAlignment" Value="Right" />
+        </StackPanel>
+        <TabControl Grid.Row="3" SelectedIndex="{Binding SelectedTab, Mode=TwoWay}" Margin="0,4,0,0">
+            <TabControl.ItemContainerStyle>
+                <Style TargetType="TabItem" >
+                    <Setter Property="Background" Value="{DynamicResource AccentColorBrush4}" />
+                    <Style.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="FontWeight" Value="Bold"  />
+                            <Setter Property="Background" Value="{DynamicResource WhiteBrush}" />
+                        </Trigger>
+                    </Style.Triggers>
                 </Style>
-            </DataGrid.Resources>
-			<DataGrid.Columns>
-				<DataGridTextColumn Header="Index" Binding="{Binding Index}" />
-				<DataGridTextColumn Header="Send Time" Binding="{Binding SendTime, StringFormat=HH:mm:ss.fff}" />
-				<DataGridTextColumn Header="Send Process" Binding="{Binding SourceProcessName}" FontWeight="Bold" />
-				<DataGridTextColumn Header="Send PID" Binding="{Binding SourceProcess}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
-				<DataGridTextColumn Header="Send TID" Binding="{Binding SourceThread}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
-				<DataGridTextColumn Header="Message ID" Binding="{Binding MessageId}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
-				<DataGridTextColumn Header="Receive Time" Binding="{Binding ReceiveTime, StringFormat=HH:mm:ss.fff}" />
-                <DataGridTextColumn Header="Receive Process" Binding="{Binding TargetProcessName}" FontWeight="Bold" />
-				<DataGridTextColumn Header="Receive PID" Binding="{Binding TargetProcess}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
-				<DataGridTextColumn Header="Receive TID" Binding="{Binding TargetThread}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
-			</DataGrid.Columns>
-		</DataGrid>
+            </TabControl.ItemContainerStyle>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/icons/event.ico" Width="20" Height="20" />
+                        <TextBlock Text="Events" Margin="4,0,0,0" VerticalAlignment="Center" FontSize="14" />
+                    </StackPanel>
+                </TabItem.Header>
+                <DataGrid IsReadOnly="True" AutoGenerateColumns="False" SelectionMode="Single" ItemsSource="{Binding Events}" FontWeight="Normal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Index" Binding="{Binding Index}" />
+                        <DataGridTextColumn Header="Time" Binding="{Binding Time, StringFormat=HH:mm:ss.fff}" />
+                        <DataGridTextColumn Header="Event Type" Binding="{Binding Type}" FontWeight="Bold" />
+                        <DataGridTextColumn Header="Process" Binding="{Binding ProcessName}" FontWeight="Bold" />
+                        <DataGridTextColumn Header="Process ID" Binding="{Binding ProcessId}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+                        <DataGridTextColumn Header="Thread ID" Binding="{Binding ThreadId}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+                        <DataGridTextColumn Header="Message ID" Binding="{Binding MessageId}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/icons/message.ico" Width="20" Height="20" />
+                        <TextBlock Text="Messages" Margin="4,0,0,0" VerticalAlignment="Center" FontSize="14" />
+                    </StackPanel>
+                </TabItem.Header>
+                <DataGrid IsReadOnly="True" AutoGenerateColumns="False" SelectionMode="Single" ItemsSource="{Binding Messages}" FontWeight="Normal">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Index" Binding="{Binding Index}" />
+                        <DataGridTextColumn Header="Send Time" Binding="{Binding SendTime, StringFormat=HH:mm:ss.fff}" />
+                        <DataGridTextColumn Header="Send Process" Binding="{Binding SourceProcessName}" FontWeight="Bold" />
+                        <DataGridTextColumn Header="Send PID" Binding="{Binding SourceProcess}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+                        <DataGridTextColumn Header="Send TID" Binding="{Binding SourceThread}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+                        <DataGridTextColumn Header="Message ID" Binding="{Binding MessageId}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+                        <DataGridTextColumn Header="Receive Time" Binding="{Binding ReceiveTime, StringFormat=HH:mm:ss.fff}" />
+                        <DataGridTextColumn Header="Receive Process" Binding="{Binding TargetProcessName}" FontWeight="Bold" />
+                        <DataGridTextColumn Header="Receive PID" Binding="{Binding TargetProcess}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+                        <DataGridTextColumn Header="Receive TID" Binding="{Binding TargetThread}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+        </TabControl>
 
-		<StatusBar Grid.Row="4">
-			<TextBlock Text="{Binding SessionState}" />
-			<Separator />
-			<TextBlock Text="{Binding Messages.Count, StringFormat=Messages: \{0\}}" MinWidth="100" />
-			<Separator />
-			<TextBlock Text="{Binding View.Count, StringFormat=Filtered: \{0\}}" MinWidth="100" />
-		</StatusBar>
-	</Grid>
+        <StatusBar Grid.Row="4">
+            <TextBlock Text="{Binding SessionState}" />
+            <Separator />
+            <TextBlock Text="{Binding Events.Count, StringFormat=Events: \{0\}}" MinWidth="100" />
+            <Separator />
+            <TextBlock Text="{Binding EventsView.Count, StringFormat=Filtered Events: \{0\}}" MinWidth="100" />
+            <Separator />
+            <TextBlock Text="{Binding Messages.Count, StringFormat=Messages: \{0\}}" MinWidth="100" />
+            <Separator />
+            <TextBlock Text="{Binding MessagesView.Count, StringFormat=Filtered Nessages: \{0\}}" MinWidth="100" />
+        </StatusBar>
+    </Grid>
 </UserControl>

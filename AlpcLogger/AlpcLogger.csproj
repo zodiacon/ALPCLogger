@@ -92,7 +92,9 @@
     </ApplicationDefinition>
     <Compile Include="Models\AlpcCapture.cs" />
     <Compile Include="Models\AlpcChainsFinder.cs" />
+    <Compile Include="Models\AlpcEvent.cs" />
     <Compile Include="Models\AlpcMessage.cs" />
+    <Compile Include="ViewModels\AlpcEventViewModel.cs" />
     <Compile Include="ViewModels\AlpcMessageViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\MainView.xaml.cs">
@@ -159,6 +161,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\delete2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\event.ico" />
+    <Resource Include="Icons\message.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.41\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets" Condition="Exists('..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.41\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets')" />

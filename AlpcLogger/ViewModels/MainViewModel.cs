@@ -21,11 +21,15 @@ using Zodiacon.WPF;
 namespace AlpcLogger.ViewModels {
 	class MainViewModel : BindableBase, IDisposable {
 		ObservableCollection<AlpcMessageViewModel> _messages = new ObservableCollection<AlpcMessageViewModel>();
-		DispatcherTimer _timer;
+		ObservableCollection<AlpcEventViewModel> _events = new ObservableCollection<AlpcEventViewModel>();
+
+		DispatcherTimer _messagesTimer, _eventsTimer;
 		AlpcCapture _capture = new AlpcCapture();
-		public ListCollectionView View { get; }
+		public ListCollectionView MessagesView { get; }
+		public ListCollectionView EventsView { get; }
 
 		public IList<AlpcMessageViewModel> Messages => _messages;
+		public IList<AlpcEventViewModel> Events => _events;
 
 		public readonly IUIServices UI;
 
@@ -34,27 +38,54 @@ namespace AlpcLogger.ViewModels {
 
 			Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
-			_timer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromSeconds(1) };
-			_timer.Tick += _timer_Tick;
-			_timer.Start();
+			_messagesTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromSeconds(1) };
+			_messagesTimer.Tick += _timer_Tick;
+			_messagesTimer.Start();
+
+			_eventsTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromSeconds(1) };
+			_eventsTimer.Tick += _timer2_Tick;
+			_eventsTimer.Start();
 
 			var thread = new Thread(_capture.Start);
 			thread.IsBackground = true;
 			thread.Priority = ThreadPriority.BelowNormal;
 			thread.Start();
 
-			View = (ListCollectionView)CollectionViewSource.GetDefaultView(Messages);
+			MessagesView = (ListCollectionView)CollectionViewSource.GetDefaultView(Messages);
+			EventsView = (ListCollectionView)CollectionViewSource.GetDefaultView(Events);
 		}
 
 		private void _timer_Tick(object sender, EventArgs e) {
-			_timer.Stop();
+			_messagesTimer.Stop();
 			var messages = _capture.GetMessagesAndClear();
 			var count = _messages.Count;
 			foreach(var msg in messages) {
 				_messages.Add(new AlpcMessageViewModel(msg, count++));
 			}
-			_timer.Start();
+
+			_messagesTimer.Start();
 		}
+
+		private void _timer2_Tick(object sender, EventArgs e) {
+			_eventsTimer.Stop();
+			var events = _capture.GetEventsAndClear();
+			var count = events.Count;
+			foreach(var evt in events)
+				_events.Add(new AlpcEventViewModel(evt, count++));
+
+			_eventsTimer.Start();
+		}
+
+		private int _selectedTab = 1;
+
+		public int SelectedTab {
+			get { return _selectedTab; }
+			set {
+				if(SetProperty(ref _selectedTab, value)) {
+				}
+			}
+		}
+
 
 		public void Dispose() {
 			_capture.Dispose();
@@ -80,10 +111,10 @@ namespace AlpcLogger.ViewModels {
 			set {
 				if(SetProperty(ref _searchText, value)) {
 					if(string.IsNullOrWhiteSpace(value))
-						View.Filter = null;
+						MessagesView.Filter = EventsView.Filter = null;
 					else {
 						var words = value.Trim().ToLowerInvariant().Split(_separators, StringSplitOptions.RemoveEmptyEntries);
-						View.Filter = obj => {
+						MessagesView.Filter = obj => {
 							var msg = (AlpcMessageViewModel)obj;
 							var src = msg.SourceProcessName.ToLowerInvariant();
 							var tgt = msg.TargetProcessName.ToLowerInvariant();
@@ -95,6 +126,20 @@ namespace AlpcLogger.ViewModels {
 									return false;
 
 								if(text[0] != '-' && (src.Contains(text) || tgt.Contains(text)))
+									return true;
+							}
+							return negates == words.Length;
+						};
+						EventsView.Filter = obj => {
+							var msg = (AlpcEventViewModel)obj;
+							var src = msg.ProcessName.ToLowerInvariant();
+							int negates = words.Count(w => w[0] == '-');
+
+							foreach(var text in words) {
+								if(text[0] == '-' && text.Length > 2 && (src.Contains(text.Substring(1).ToLowerInvariant())))
+									return false;
+
+								if(text[0] != '-' && src.Contains(text))
 									return true;
 							}
 							return negates == words.Length;
@@ -122,7 +167,7 @@ namespace AlpcLogger.ViewModels {
 		}, () => IsRunning).ObservesProperty(() => IsRunning);
 
 		public ICommand FindChainsCommand => new DelegateCommand(() => {
-			var finder = new AlpcChainsFinder(Messages.Where(m => View.PassesFilter(m)).Select(m => m.Message).ToList());
+			var finder = new AlpcChainsFinder(Messages.Where(m => MessagesView.PassesFilter(m)).Select(m => m.Message).ToList());
 			foreach(var chain in finder.FindAllChains()) {
 				var msg1 = chain[0];
 				var msg2 = chain[1];
@@ -140,7 +185,7 @@ namespace AlpcLogger.ViewModels {
 		public ICommand ClearLogCommand => new DelegateCommand(() => Messages.Clear());
 
 		public DelegateCommandBase SaveFilteredCommand => new DelegateCommand(() => {
-			if(View.Count == 0)
+			if(MessagesView.Count == 0)
 				return;
 
 			DoSave(false);
@@ -155,7 +200,7 @@ namespace AlpcLogger.ViewModels {
 		}
 
 		private void SaveInternal(string filename, bool all) {
-			_timer.Stop();
+			_messagesTimer.Stop();
 
 			try {
 				var config = new CsvConfiguration {
@@ -166,7 +211,7 @@ namespace AlpcLogger.ViewModels {
 					var csvWriter = new CsvWriter(writer, config);
 					csvWriter.WriteHeader<AlpcMessageViewModel>();
 					foreach(var msg in _messages)
-						if(all || View.Contains(msg))
+						if(all || MessagesView.Contains(msg))
 							csvWriter.WriteRecord(msg);
 				}
 			}
@@ -174,7 +219,7 @@ namespace AlpcLogger.ViewModels {
 				UI.MessageBoxService.ShowMessage(ex.Message, App.Name);
 			}
 			finally {
-				_timer.Start();
+				_messagesTimer.Start();
 			}
 		}
 	}

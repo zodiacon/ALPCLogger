@@ -12,13 +12,22 @@ namespace AlpcLogger.Models {
 		List<AlpcMessage> _messages = new List<AlpcMessage>(1 << 16);
 		TraceEventSession _session;
 		List<ALPCSendMessageTraceData> _sendMessages = new List<ALPCSendMessageTraceData>(32);
+		List<AlpcEvent> _events = new List<AlpcEvent>(512);
 
 		public bool IsRunning { get; set; }
 
 		public IReadOnlyList<AlpcMessage> GetMessages() => _messages.ToList();
 
+		public IReadOnlyList<AlpcEvent> GetEventsAndClear() {
+			lock(_events) {
+				var events = _events.ToList();
+				_events.Clear();
+				return events;
+			}
+		}
+
 		public IReadOnlyList<AlpcMessage> GetMessagesAndClear() {
-			lock (_messages) {
+			lock(_messages) {
 				var result = _messages.ToList();
 				_messages.Clear();
 				return result;
@@ -31,9 +40,9 @@ namespace AlpcLogger.Models {
 		}
 
 		public void Start() {
-			_session = new TraceEventSession("ALPCCapture");
+			_session = new TraceEventSession("ALPCLogger");
 			_session.StopOnDispose = true;
-			_session.BufferSizeMB = 128;
+			_session.BufferSizeMB = 64;
 
 			_session.EnableKernelProvider(KernelTraceEventParser.Keywords.AdvancedLocalProcedureCalls,
 				KernelTraceEventParser.Keywords.AdvancedLocalProcedureCalls);
@@ -41,8 +50,8 @@ namespace AlpcLogger.Models {
 			var parser = new KernelTraceEventParser(_session.Source);
 			parser.ALPCReceiveMessage += Parser_ALPCReceiveMessage;
 			parser.ALPCSendMessage += Parser_ALPCSendMessage;
-			//parser.ALPCWaitForReply += Parser_ALPCWaitForReply;
-			//parser.ALPCUnwait += Parser_ALPCUnwait;
+			parser.ALPCWaitForReply += Parser_ALPCWaitForReply;
+			parser.ALPCUnwait += Parser_ALPCUnwait;
 			_session.Source.Process();
 		}
 
@@ -54,32 +63,58 @@ namespace AlpcLogger.Models {
 			IsRunning = true;
 		}
 
+		void AddEvent(AlpcEvent evt) {
+			if(!IsRunning)
+				return;
+
+			lock(_events) {
+				_events.Add(evt);
+				if(_events.Count > 10000)
+					_events.RemoveRange(0, 100);
+			}
+		}
+
 		private void Parser_ALPCUnwait(ALPCUnwaitTraceData obj) {
-			//Console.WriteLine($"Unwait {obj.ProcessName} TID={obj.ThreadID} status: {obj.Status}");
+			AddEvent(new AlpcEvent(obj) {
+				Type = AlpcEventType.Unwait,
+			});
 		}
 
 		private void Parser_ALPCWaitForReply(ALPCWaitForReplyTraceData obj) {
-			//Console.WriteLine($"Wait for reply {obj.ProcessName} TID={obj.ThreadID} msg: {obj.MessageID}...");
+			AddEvent(new AlpcEvent(obj) {
+				Type = AlpcEventType.WaitForReply,
+				MessageId = obj.MessageID,
+			});
 		}
 
 		private void Parser_ALPCSendMessage(ALPCSendMessageTraceData obj) {
-			if (!IsRunning)
+			if(!IsRunning)
 				return;
 
-			lock (_sendMessages) {
+			AddEvent(new AlpcEvent(obj) {
+				Type = AlpcEventType.SendMessage,
+				MessageId = obj.MessageID,
+			});
+
+			lock(_sendMessages) {
 				_sendMessages.Add((ALPCSendMessageTraceData)obj.Clone());
 			}
 		}
 
 		private void Parser_ALPCReceiveMessage(ALPCReceiveMessageTraceData obj) {
-			if (!IsRunning)
+			if(!IsRunning)
 				return;
 
+			AddEvent(new AlpcEvent(obj) {
+				Type = AlpcEventType.ReceiveMessage,
+				MessageId = obj.MessageID,
+			});
+
 			ALPCSendMessageTraceData source;
-			lock (_sendMessages) {
+			lock(_sendMessages) {
 				source = _sendMessages.FirstOrDefault(msg => msg.MessageID == obj.MessageID);
 			}
-			if (source == null) {
+			if(source == null) {
 				//Console.WriteLine($"Receive without Send {obj.ProcessName} ({obj.ProcessID}) msg: {obj.MessageID}");
 				return;
 			}
@@ -95,7 +130,7 @@ namespace AlpcLogger.Models {
 				SendTime = source.TimeStamp,
 				ReceiveTime = obj.TimeStamp,
 			};
-			lock (_messages) {
+			lock(_messages) {
 				_messages.Add(message);
 			}
 			_sendMessages.Remove(source);
