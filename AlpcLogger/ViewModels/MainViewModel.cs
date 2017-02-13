@@ -209,10 +209,18 @@ namespace AlpcLogger.ViewModels {
 
 				using(var writer = new StreamWriter(filename)) {
 					var csvWriter = new CsvWriter(writer, config);
-					csvWriter.WriteHeader<AlpcMessageViewModel>();
-					foreach(var msg in _messages)
-						if(all || MessagesView.Contains(msg))
-							csvWriter.WriteRecord(msg);
+					if(SelectedTab == 1) {
+						csvWriter.WriteHeader<AlpcMessageViewModel>();
+						foreach(var msg in _messages)
+							if(all || MessagesView.Contains(msg))
+								csvWriter.WriteRecord(msg);
+					}
+					else {
+						csvWriter.WriteHeader<AlpcEventViewModel>();
+						foreach(var evt in _events)
+							if(all || EventsView.Contains(evt))
+								csvWriter.WriteRecord(evt);
+					}
 				}
 			}
 			catch(Exception ex) {

@@ -22,6 +22,7 @@ namespace AlpcLogger {
 			var vm = new MainViewModel(ui);
 			var win = new MainWindow { DataContext = vm };
 			win.Show();
+			ui.MessageBoxService.SetOwner(win);
 		}
 	}
 }
