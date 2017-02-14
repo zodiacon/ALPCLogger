@@ -42,7 +42,7 @@ namespace AlpcLogger.ViewModels {
 			_messagesTimer.Tick += _timer_Tick;
 			_messagesTimer.Start();
 
-			_eventsTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromSeconds(1) };
+			_eventsTimer = new DispatcherTimer(DispatcherPriority.Background) { Interval = TimeSpan.FromSeconds(1.5) };
 			_eventsTimer.Tick += _timer2_Tick;
 			_eventsTimer.Start();
 
@@ -182,7 +182,10 @@ namespace AlpcLogger.ViewModels {
 			DoSave(true);
 		});
 
-		public ICommand ClearLogCommand => new DelegateCommand(() => Messages.Clear());
+		public ICommand ClearLogCommand => new DelegateCommand(() => {
+			Messages.Clear();
+			Events.Clear();
+		});
 
 		public DelegateCommandBase SaveFilteredCommand => new DelegateCommand(() => {
 			if(MessagesView.Count == 0)

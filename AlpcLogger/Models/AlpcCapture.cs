@@ -50,8 +50,8 @@ namespace AlpcLogger.Models {
 			var parser = new KernelTraceEventParser(_session.Source);
 			parser.ALPCReceiveMessage += Parser_ALPCReceiveMessage;
 			parser.ALPCSendMessage += Parser_ALPCSendMessage;
-			parser.ALPCWaitForReply += Parser_ALPCWaitForReply;
-			parser.ALPCUnwait += Parser_ALPCUnwait;
+			//parser.ALPCWaitForReply += Parser_ALPCWaitForReply;
+			//parser.ALPCUnwait += Parser_ALPCUnwait;
 			_session.Source.Process();
 		}
 
