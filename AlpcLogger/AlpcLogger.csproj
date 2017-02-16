@@ -53,9 +53,10 @@
       <HintPath>..\packages\MahApps.Metro.1.4.3\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Diagnostics.Tracing.TraceEvent, Version=1.0.41.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.41\lib\net40\Microsoft.Diagnostics.Tracing.TraceEvent.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Diagnostics.Tracing.TraceEvent, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Temp\EtwTest\bin\Debug\Microsoft.Diagnostics.Tracing.TraceEvent.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Prism, Version=6.1.0.0, Culture=neutral, PublicKeyToken=91a96d2a154366d8, processorArchitecture=MSIL">
       <HintPath>..\packages\Prism.Core.6.1.0\lib\net45\Prism.dll</HintPath>
@@ -80,8 +81,8 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="Zodiacon.WPF, Version=1.1.6248.27445, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Zodiacon.WPF.1.1.14\lib\net45\Zodiacon.WPF.dll</HintPath>
+    <Reference Include="Zodiacon.WPF, Version=1.1.6252.24949, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Zodiacon.WPF.1.1.15\lib\net45\Zodiacon.WPF.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -94,9 +95,14 @@
     <Compile Include="Models\AlpcChainsFinder.cs" />
     <Compile Include="Models\AlpcEvent.cs" />
     <Compile Include="Models\AlpcMessage.cs" />
+    <Compile Include="Models\CallStack.cs" />
     <Compile Include="ViewModels\AlpcEventViewModel.cs" />
     <Compile Include="ViewModels\AlpcMessageViewModel.cs" />
+    <Compile Include="ViewModels\CallStackViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="Views\CallStackView.xaml.cs">
+      <DependentUpon>CallStackView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
@@ -112,6 +118,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\CallStackView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -166,14 +176,16 @@
     <Resource Include="Icons\event.ico" />
     <Resource Include="Icons\message.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\stack.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DebugHelp\DebugHelp\DebugHelp.csproj">
+      <Project>{db1d8fea-43a9-4c62-9eb3-e541a3550c3b}</Project>
+      <Name>DebugHelp</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.41\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets" Condition="Exists('..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.41\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.41\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Diagnostics.Tracing.TraceEvent.1.0.41\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets'))" />
-  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

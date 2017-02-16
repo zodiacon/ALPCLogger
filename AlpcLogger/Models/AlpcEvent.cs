@@ -28,5 +28,7 @@ namespace AlpcLogger.Models {
 		public string ProcessName { get; set; }
 		public int MessageId { get; set; } = -1;
 		public DateTime Time { get; set; }
+
+		public ulong[] Stack { get; set; }
 	}
 }

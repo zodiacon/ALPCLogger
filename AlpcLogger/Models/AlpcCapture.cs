@@ -2,6 +2,7 @@
 using Microsoft.Diagnostics.Tracing.Parsers.Kernel;
 using Microsoft.Diagnostics.Tracing.Session;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ namespace AlpcLogger.Models {
 		TraceEventSession _session;
 		List<ALPCSendMessageTraceData> _sendMessages = new List<ALPCSendMessageTraceData>(32);
 		List<AlpcEvent> _events = new List<AlpcEvent>(512);
+		ConcurrentDictionary<int, AlpcEvent> _threadToEvent = new ConcurrentDictionary<int, AlpcEvent>(2, 64);
 
 		public bool IsRunning { get; set; }
 
@@ -40,7 +42,8 @@ namespace AlpcLogger.Models {
 		}
 
 		public void Start() {
-			_session = new TraceEventSession("ALPCLogger");
+			var version = Environment.OSVersion.Version;
+			_session = new TraceEventSession(version.Major == 6 && version.Minor == 1 ? KernelTraceEventParser.KernelSessionName : "ALPCLogger");
 			_session.StopOnDispose = true;
 			_session.BufferSizeMB = 64;
 
@@ -50,9 +53,17 @@ namespace AlpcLogger.Models {
 			var parser = new KernelTraceEventParser(_session.Source);
 			parser.ALPCReceiveMessage += Parser_ALPCReceiveMessage;
 			parser.ALPCSendMessage += Parser_ALPCSendMessage;
+			parser.StackWalkStack += Parser_StackWalkStack;
 			//parser.ALPCWaitForReply += Parser_ALPCWaitForReply;
 			//parser.ALPCUnwait += Parser_ALPCUnwait;
 			_session.Source.Process();
+		}
+
+		private void Parser_StackWalkStack(StackWalkStackTraceData obj) {
+			AlpcEvent evt;
+			if(_threadToEvent.TryRemove(obj.ThreadID, out evt)) {
+				evt.Stack = Enumerable.Range(0, obj.FrameCount).Select(i => obj.InstructionPointer(i)).ToArray();
+			}
 		}
 
 		public void Pause() {
@@ -72,6 +83,7 @@ namespace AlpcLogger.Models {
 				if(_events.Count > 10000)
 					_events.RemoveRange(0, 100);
 			}
+			_threadToEvent.TryAdd(evt.ThreadId, evt);
 		}
 
 		private void Parser_ALPCUnwait(ALPCUnwaitTraceData obj) {

@@ -1,4 +1,5 @@
 ﻿using AlpcLogger.Models;
+using AlpcLogger.Views;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Prism.Commands;
@@ -181,6 +182,19 @@ namespace AlpcLogger.ViewModels {
 
 			DoSave(true);
 		});
+
+		private AlpcEventViewModel _selectedEvent;
+
+		public AlpcEventViewModel SelectedEvent {
+			get { return _selectedEvent; }
+			set { SetProperty(ref _selectedEvent, value); }
+		}
+
+		public DelegateCommandBase StackCommand => new DelegateCommand(() => {
+			var stack = SelectedEvent.Stack;
+			var vm = UI.DialogService.CreateDialog<CallStackViewModel, CallStackView>(stack);
+			vm.Show();
+		}, () => SelectedEvent != null).ObservesProperty(() => SelectedEvent);
 
 		public ICommand ClearLogCommand => new DelegateCommand(() => {
 			Messages.Clear();
