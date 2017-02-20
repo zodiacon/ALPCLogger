@@ -49,6 +49,10 @@
       <HintPath>..\packages\CsvHelper.2.16.3.0\lib\net45\CsvHelper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="DebugHelp, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DebugHelp.0.1.1\lib\net40\DebugHelp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MahApps.Metro, Version=1.4.3.0, Culture=neutral, PublicKeyToken=f4fb5a3c4d1e5b4f, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.4.3\lib\net45\MahApps.Metro.dll</HintPath>
       <Private>True</Private>
@@ -178,12 +182,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Icons\stack.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\DebugHelp\DebugHelp\DebugHelp.csproj">
-      <Project>{db1d8fea-43a9-4c62-9eb3-e541a3550c3b}</Project>
-      <Name>DebugHelp</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

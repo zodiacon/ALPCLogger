@@ -194,7 +194,8 @@ namespace AlpcLogger.ViewModels {
 			var stack = SelectedEvent.Stack;
 			var vm = UI.DialogService.CreateDialog<CallStackViewModel, CallStackView>(stack);
 			vm.Show();
-		}, () => SelectedEvent != null).ObservesProperty(() => SelectedEvent);
+		}, () => SelectedEvent != null && SelectedTab == 0)
+			.ObservesProperty(() => SelectedEvent).ObservesProperty(() => SelectedTab);
 
 		public ICommand ClearLogCommand => new DelegateCommand(() => {
 			Messages.Clear();
