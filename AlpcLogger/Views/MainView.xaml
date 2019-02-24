@@ -95,7 +95,7 @@
 					</StackPanel>
 				</TabItem.Header>
 				<DataGrid IsReadOnly="True" AutoGenerateColumns="False" SelectionMode="Single" ItemsSource="{Binding Events}" FontWeight="Normal"
-							 SelectedItem="{Binding SelectedEvent, Mode=TwoWay}">
+							 SelectedItem="{Binding SelectedEvent, Mode=TwoWay}" VirtualizingPanel.VirtualizationMode="Recycling">
 					<DataGrid.Columns>
 						<DataGridTextColumn Header="Index" Binding="{Binding Index}" />
 						<DataGridTextColumn Header="Time" Binding="{Binding Time, Mode=OneTime, StringFormat=HH:mm:ss.fff}" />
@@ -104,7 +104,8 @@
 						<DataGridTextColumn Header="Process ID" Binding="{Binding ProcessId, Mode=OneTime}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
 						<DataGridTextColumn Header="Thread ID" Binding="{Binding ThreadId, Mode=OneTime}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
 						<DataGridTextColumn Header="Message ID" Binding="{Binding MessageId, Mode=OneTime}" ElementStyle="{StaticResource RightAlignTextBlockStyle}" />
-					</DataGrid.Columns>
+                        <DataGridTextColumn Header="Activity ID" Binding="{Binding ActivityID}" />
+                    </DataGrid.Columns>
 				</DataGrid>
 			</TabItem>
 			<TabItem>

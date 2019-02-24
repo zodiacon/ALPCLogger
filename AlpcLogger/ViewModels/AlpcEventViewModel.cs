@@ -16,6 +16,8 @@ namespace AlpcLogger.ViewModels {
 			Index = index;
 		}
 
+		public Guid ActivityID => Event.ActivityID;
+
 		public string ProcessName => Event.ProcessName;
 		public int ProcessId => Event.ProcessId;
 		public int ThreadId => Event.ThreadId;

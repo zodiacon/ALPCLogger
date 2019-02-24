@@ -20,11 +20,13 @@ namespace AlpcLogger.Models {
 			ProcessId = evt.ProcessID;
 			ThreadId = evt.ThreadID;
 			ProcessName = evt.ProcessName;
+			ActivityID = evt.ActivityID;
 		}
 
+		public Guid ActivityID { get; }
 		public AlpcEventType Type { get; set; }
-		public int ProcessId { get; set; }
-		public int ThreadId { get; set; }
+		public int ProcessId { get; }
+		public int ThreadId { get; }
 		public string ProcessName { get; set; }
 		public int MessageId { get; set; } = -1;
 		public DateTime Time { get; set; }

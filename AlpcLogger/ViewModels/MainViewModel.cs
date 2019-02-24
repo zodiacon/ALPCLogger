@@ -98,7 +98,7 @@ namespace AlpcLogger.ViewModels {
 			get { return _isRunning; }
 			set {
 				if(SetProperty(ref _isRunning, value)) {
-					OnPropertyChanged(() => SessionState);
+					RaisePropertyChanged(nameof(SessionState));
 				}
 			}
 		}
@@ -221,8 +221,8 @@ namespace AlpcLogger.ViewModels {
 			_messagesTimer.Stop();
 
 			try {
-				var config = new CsvConfiguration {
-					IgnorePrivateAccessor = true,
+				var config = new Configuration {
+					IncludePrivateMembers = true,
 				};
 
 				using(var writer = new StreamWriter(filename)) {
