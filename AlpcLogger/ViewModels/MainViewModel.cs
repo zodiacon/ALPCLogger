@@ -227,21 +227,21 @@ namespace AlpcLogger.ViewModels {
 
 				using(var writer = new StreamWriter(filename)) {
 					var csvWriter = new CsvWriter(writer, config);
-					if(SelectedTab == 1) {
+					if( all ) {
+						csvWriter.WriteRecords(_messages);
+					} else {
 						csvWriter.WriteHeader<AlpcMessageViewModel>();
-						foreach(var msg in _messages)
-							if(all || MessagesView.Contains(msg))
+						csvWriter.NextRecord();
+						foreach(var msg in _messages) {
+							if(MessagesView.Contains(msg)) {
 								csvWriter.WriteRecord(msg);
-					}
-					else {
-						csvWriter.WriteHeader<AlpcEventViewModel>();
-						foreach(var evt in _events)
-							if(all || EventsView.Contains(evt))
-								csvWriter.WriteRecord(evt);
+								csvWriter.NextRecord();
+							}
+						}
 					}
 				}
 			}
-			catch(Exception ex) {
+			catch (Exception ex) {
 				UI.MessageBoxService.ShowMessage(ex.Message, App.Name);
 			}
 			finally {
