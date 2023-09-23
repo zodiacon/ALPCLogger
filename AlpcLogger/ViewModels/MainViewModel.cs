@@ -118,7 +118,9 @@ namespace AlpcLogger.ViewModels {
 						MessagesView.Filter = obj => {
 							var msg = (AlpcMessageViewModel)obj;
 							var src = msg.SourceProcessName.ToLowerInvariant();
+							var srcPid = msg.SourceProcess.ToString();
 							var tgt = msg.TargetProcessName.ToLowerInvariant();
+							var tgtPid = msg.TargetProcess.ToString();
 							int negates = words.Count(w => w[0] == '-');
 
 							foreach(var text in words) {
@@ -127,6 +129,9 @@ namespace AlpcLogger.ViewModels {
 									return false;
 
 								if(text[0] != '-' && (src.Contains(text) || tgt.Contains(text)))
+									return true;
+
+								if(text[0] != '-' && (srcPid.Contains(text) || tgtPid.Contains(text)))
 									return true;
 							}
 							return negates == words.Length;
